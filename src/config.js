@@ -1,10 +1,12 @@
 import React from 'react';
 import PageLoading from 'components/Loading/PageLoading';
-import { normal } from 'components/Notification';
+import { normal, antdNotice } from 'components/Notification';
 import store from 'cmn-utils/lib/store';
+import { routerRedux } from 'dva/router';
+import appIndex from '@/index';
 
 // 系统通知, 定义使用什么风格的通知，normal或antdNotice
-const notice = normal;
+const notice = antdNotice;
 
 /**
  * 应用配置 如请求格式，反回格式，异常处理方式，分页格式等
@@ -13,7 +15,7 @@ export default {
   /**
    * HTML的title模板
    */
-  htmlTitle: 'DBAdmin - {title}',
+  htmlTitle: 'AdmBoots - {title}',
   
   /**
    * 系统通知
@@ -25,9 +27,10 @@ export default {
     prefix: '/api',
 
     // 每次请求头部都会带着这些参数
-    withHeaders: () => ({
-      token: store.getStore("token"),
-    }),
+    withHeaders: () => {
+      const user = store.getStore('user');
+      return user ? { Authorization: 'Bearer ' + user.accessToken } : null;
+    },
 
     /**
      * 因为modelEnhance需要知道服务器反回的数据，
@@ -46,17 +49,29 @@ export default {
       }
     },
     errorHandle: err => {
-      // 请求错误全局拦截
-      if (err.name === 'RequestError') {
-        notice.error(err.text || err.message);
+       // 请求错误全局拦截
+       if (err.name === 'RequestError') {
+        if (err.code === 401) {
+          const { dispatch } = appIndex;
+          dispatch(routerRedux.replace('/sign/login'));
+          //return subscriberPromise(info);
+        } else if (err.code === 403) {
+          notice.error('抱歉，您无权访问该资源');
+        } else {
+          notice.error(err.text || err.message);
+        }
       }
-    }
+    },
   },
 
   // 全局异常
   exception: {
     global: (err, dispatch) => {
       const errName = err.name;
+      if (err.code === 401) {
+        notice.error('令牌失效，请重新登陆');
+        return;
+      }
       // RequestError为拦截请求异常
       if (errName === 'RequestError') {
         notice.error(err.message);
@@ -73,28 +88,28 @@ export default {
     requestFormat: pageInfo => {
       const { pageNum, pageSize, filters, sorts } = pageInfo;
       return {
-        currentPage: pageNum,
-        showCount: pageSize,
-        sortMap: sorts,
-        paramMap: filters
+        pageIndex: pageNum,
+        pageSize: pageSize,
+        sortField: sorts,
+        ...filters,
       };
     },
 
     // 格式化从后端反回的数据
     responseFormat: resp => {
       const {
-        currentPage,
-        showCount,
-        totalResult,
-        dataList,
-        totalPage
+        pageIndex,
+        pageSize,
+        totalElements,
+        content,
+        totalPages,
       } = resp.data;
       return {
-        pageNum: currentPage,
-        pageSize: showCount,
-        total: totalResult,
-        totalPages: totalPage,
-        list: dataList
+        pageNum: pageIndex,
+        pageSize: pageSize,
+        total: totalElements,
+        totalPages: totalPages,
+        list: content,
       };
     }
   },

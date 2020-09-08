@@ -26,7 +26,7 @@ export default class PageInfo {
   filters = {};
 
   // 排序条件 {name: 'asc', age: 'desc'}
-  sorts = {};
+  sorts = '';
 
   /**
    * 希望用户输入的页数不在合法范围（第一页到最后一页之外）
@@ -48,7 +48,7 @@ export default class PageInfo {
     this.totalPages = 0;
     this.list = [];
     this.filters = {};
-    this.sorts = {};
+    this.sorts = '';
     return this;
   }
 
@@ -83,10 +83,10 @@ export default class PageInfo {
 
   /**
    * 拼接排序条件
-   * @param {object} q 排序字段 {name: 'asc', age: 'desc'}
+   * @param {object} q 排序字段 'name asc, age desc'
    */
   sortBy(q) {
-    if ($$.isObject(q)) {
+    if ({}.toString.call(q) === '[object String]') {
       this.sorts = q;
     }
     return this;

@@ -33,6 +33,7 @@
     "masonry-layout": "^4.2.1",
     "object.omit": "^3.0.0",
     "path-to-regexp": "^2.2.1",
+    "qs": "^6.9.4",
     "react": "^16.13.0",
     "react-dom": "^16.13.0",
     "react-fast-compare": "^3.0.1",
