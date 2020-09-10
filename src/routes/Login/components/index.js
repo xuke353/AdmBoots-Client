@@ -31,8 +31,8 @@ export default class Login extends Component {
             <Form onFinish={this.handleSubmit} className="login-form" initialValues={{ userName: 'admin', password: 'admin', remember: true }}>
               <div className="user-img">
                 <img src={logoImg} alt="logo" />
-                <b>LANIF</b>
-                <span>Admin</span>
+                <b>ADM</b>
+                <span>Boots</span>
               </div>
               <FormItem name="userName" rules={[{ required: true, message: '请输入您的用户名，示例admin' }]}>
                 <Input
@@ -41,7 +41,7 @@ export default class Login extends Component {
                   placeholder="用户名"
                 />
               </FormItem>
-              <FormItem name="password" rules={[{ required: true, message: '请输入您的密码，示例admin' }]}>
+              <FormItem name="password" rules={[{ required: true, message: '请输入您的密码，示例a123456' }]}>
                 <Input
                   size="large"
                   prefix={<LockOutlined />}

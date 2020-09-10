@@ -16,6 +16,8 @@ export default {
       return history.listen(({ pathname }) => {
         if (pathname.indexOf('/sign/login') !== -1) {
           $$.removeStore('user');
+          $$.removeStore('expireDate');
+          $$.removeStore('permission');
         }
       });
     }
@@ -27,6 +29,11 @@ export default {
         const { status, message, data } = yield call(login, payload);
         if (status) {
           $$.setStore('user', data);
+          const curTime = new Date();
+          const expireDate = new Date(
+            curTime.setSeconds(curTime.getSeconds() + data.expireInSeconds)
+          );
+          $$.setStore('expireDate', expireDate);
           yield put(routerRedux.replace('/'));
         } else {
           yield put({

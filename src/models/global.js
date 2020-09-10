@@ -31,6 +31,12 @@ export default modelEnhance({
         });
       }
     },
+    *getPermission({ payload }, { call, put }) {
+      const { status, data } = yield call(getPermission, payload);
+      if (status) {
+        $$.setStore('permission', data);
+      }
+    },
   },
 
   reducers: {
@@ -56,5 +62,13 @@ export function getFlatMenu(menus) {
 }
 
 export async function getMenu(payload) {
-  return $$.post('/user/menu', payload);
+  return $$.post('/user/menu', payload).catch((e) => {
+    return { status: false };
+  });
+}
+
+export async function getPermission(payload) {
+  return $$.get('/v1/users/permission', payload).catch((e) => {
+    return { status: false };
+  });
 }
