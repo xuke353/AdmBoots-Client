@@ -134,7 +134,7 @@ export default modelEnhance({
         type: '@request',
         payload: {
           notice: true,
-          url: `/v1/users/resetPassword/${id}/pwd` + id,
+          url: `/v1/users/${id}/pwd`,
           method: 'PUT',
         },
       });

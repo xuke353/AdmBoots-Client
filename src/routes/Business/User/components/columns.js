@@ -1,10 +1,9 @@
 import React from 'react';
 import DataTable from 'components/DataTable';
-import Icon from 'components/Icon';
 import Button from 'components/Button';
 import { Badge, Tooltip } from 'antd';
 import { formatDateTime } from '@/utils/tool';
-import { EditOutlined,RedoOutlined, DeleteOutlined } from '@ant-design/icons';
+import { EditOutlined,RedoOutlined, DeleteOutlined, LockOutlined } from '@ant-design/icons';
 
 export default (self, roles) => [
   {
@@ -24,7 +23,7 @@ export default (self, roles) => [
           <span>
             {text}&nbsp;
             <Tooltip title="该用户为超级管理员">
-              <Icon type="lock" antd style={{ cursor: 'pointer' }} />
+              <LockOutlined style={{ cursor: 'pointer' }}/>
             </Tooltip>
           </span>
         ) : (
@@ -54,14 +53,16 @@ export default (self, roles) => [
           },
         };
       },
-      render: (text) => text.map((item) => item.roleName).join('|'),
+      render: (text) =>   <Tooltip placement="topLeft" title={text.map((item) => item.name).join('|')}>
+                            {text.map((item) => item.name).join('|')}
+                          </Tooltip>
     },
     formItem: {
       rules: [{ required: true, message: '请选择角色!' }],
       type: 'transfer',
       modal: true,
       dataSource: roles.map((m) => ({ key: m.roleId, title: m.roleName })),
-      normalize: (value) => value.map((item) => item.roleId),
+      normalize: (text) => text.map((item) => item.id),
     },
   },
   {
@@ -69,16 +70,16 @@ export default (self, roles) => [
     name: 'email',
     tableItem: {},
     formItem: {
-      rules: [
-        {
-          required: true,
-          message: '请输入邮箱地址！',
-        },
-        {
-          type: 'email',
-          message: '邮箱地址格式错误！',
-        },
-      ],
+      // rules: [
+      //   {
+      //     required: true,
+      //     message: '请输入邮箱地址！',
+      //   },
+      //   {
+      //     type: 'email',
+      //     message: '邮箱地址格式错误！',
+      //   },
+      // ],
     },
   },
   {
@@ -135,6 +136,7 @@ export default (self, roles) => [
             type="danger"
             icon={<DeleteOutlined />}
             onClick={() => self.onDelete(record)}
+            disabled={record.isMaster}
           >
             删除
           </Button>
@@ -143,6 +145,7 @@ export default (self, roles) => [
             type="primary"
             icon={<RedoOutlined />}
             onClick={() => self.onResetPassword(record)}
+            disabled={record.isMaster}            
           >
             重置密码
           </Button>
