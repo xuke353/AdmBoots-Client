@@ -91,7 +91,7 @@ export default {
         pageIndex: pageNum,
         pageSize: pageSize,
         sortField: sorts,
-        ...filters,
+        ...JSON.parse(JSON.stringify(filters)), //去除get请求中参数值undefined
       };
     },
 

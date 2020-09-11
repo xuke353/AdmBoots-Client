@@ -25,8 +25,8 @@ export default class PageInfo {
   // 过滤条件 {name: 'jonn'}
   filters = {};
 
-  // 排序条件 {name: 'asc', age: 'desc'}
-  sorts = '';
+  // 排序条件 'name desc'
+  sorts = null;
 
   /**
    * 希望用户输入的页数不在合法范围（第一页到最后一页之外）
@@ -48,7 +48,7 @@ export default class PageInfo {
     this.totalPages = 0;
     this.list = [];
     this.filters = {};
-    this.sorts = '';
+    this.sorts = null;
     return this;
   }
 

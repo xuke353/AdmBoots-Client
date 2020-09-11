@@ -62,7 +62,7 @@ export function getFlatMenu(menus) {
 }
 
 export async function getMenu(payload) {
-  return $$.post('/user/menu', payload).catch((e) => {
+  return $$.post('/v1/menus/roleMenus', payload).catch((e) => {
     return { status: false };
   });
 }

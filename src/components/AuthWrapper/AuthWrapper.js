@@ -8,9 +8,9 @@ import $$ from 'cmn-utils';
  */
 export function checkAuth(authorized, menuRoute) {
   const permissionList = $$.getStore('permission');
-  return permissionList.some(
-    (p) => p.link == menuRoute && p.code == authorized
-  );
+  return permissionList ? permissionList.some(
+    (p) => p.uri === menuRoute && p.code === authorized
+  ) : false;
 }
 
 /**

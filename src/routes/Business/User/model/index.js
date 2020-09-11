@@ -48,7 +48,7 @@ export default modelEnhance({
         type: '@request',
         payload: {
           valueField: 'pageData',
-          url: '/v1/users/getList',
+          url: '/v1/users',
           pageInfo: pageData,
           method: 'GET',
         },
@@ -63,8 +63,9 @@ export default modelEnhance({
         type: '@request',
         payload: {
           notice: true,
-          url: '/v1/users/save',
+          url: '/v1/users',
           data: values,
+          method: 'POST',
         },
       });
 
@@ -77,14 +78,13 @@ export default modelEnhance({
     // 修改
     *update({ payload }, { call, put, select, take }) {
       const { record, values, success } = payload;
-      values.id = record.id;
       const { pageData } = yield select((state) => state.user);
       // put是非阻塞的 put.resolve是阻塞型的
       yield put.resolve({
         type: '@request',
         payload: {
           notice: true,
-          url: `/v1/users/update`,
+          url: `/v1/users/${record.id}`,
           data: values,
           method: 'PUT',
         },
@@ -104,8 +104,8 @@ export default modelEnhance({
         type: '@request',
         payload: {
           notice: true,
-          url: '/v1/users/delete',
-          data: records.map((item) => item.rowKey),
+          url: '/v1/users',
+          data: records.map((item) => item.id),
           method: 'DELETE',
         },
       });
@@ -122,7 +122,7 @@ export default modelEnhance({
         afterResponse: (resp) => resp.data,
         payload: {
           valueField: 'roles',
-          url: '/v1/users/getTransferRoles',
+          url: '/v1/roles/transferRoles',
           method: 'GET',
         },
       });
@@ -134,7 +134,7 @@ export default modelEnhance({
         type: '@request',
         payload: {
           notice: true,
-          url: '/v1/users/resetPassword/' + id,
+          url: `/v1/users/resetPassword/${id}/pwd` + id,
           method: 'PUT',
         },
       });

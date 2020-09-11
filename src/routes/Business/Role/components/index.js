@@ -1,4 +1,5 @@
 import React from 'react';
+import { PlusOutlined, DeleteOutlined } from '@ant-design/icons';
 import { connect } from 'dva';
 import { Layout, Button, Modal, Tree, Tag } from 'antd';
 import BaseComponent from 'components/BaseComponent';
@@ -10,7 +11,21 @@ import createColumns from './columns';
 import './index.less';
 const { Content, Header, Footer } = Layout;
 const Pagination = DataTable.Pagination;
-const TreeNode = Tree.TreeNode;
+
+const dig = (data) =>{
+  const list = [];
+  data.forEach((item) => {
+    const treeNode = {
+      key: item.id,
+      title: item.menuType === 1 ? item.name : <Tag>{item.name}</Tag>
+    };
+    if (item.children) {
+      treeNode.children=dig(item.children)
+    }
+    list.push(treeNode);
+  });
+  return list;
+}
 
 @connect(({ role, loading }) => ({
   role,
@@ -36,7 +51,7 @@ export default class extends BaseComponent {
           // 如果操作成功，在已选择的行中，排除删除的行
           this.setState({
             rows: rows.filter(
-              (item) => !records.some((jtem) => jtem.rowKey === item.rowKey)
+              (item) => !records.some((jtem) => jtem.id === item.id)
             ),
           });
         },
@@ -52,51 +67,6 @@ export default class extends BaseComponent {
       checkedKeys: menuIds,
       record,
       distributeModalVisible: true,
-    });
-  };
-
-  renderTreeNodes = (data) => {
-    return data.map((item) => {
-      if (item.children) {
-        return (
-          <TreeNode
-            title={
-              <span>
-                <span>{item.name}</span>
-                <span style={{ float: 'right' }}>
-                  {item.menuType === 1 ? (
-                    <Tag color="magenta">菜单</Tag>
-                  ) : (
-                    <Tag color="cyan">按钮</Tag>
-                  )}
-                </span>
-              </span>
-            }
-            key={item.id}
-            dataRef={item}
-          >
-            {this.renderTreeNodes(item.children)}
-          </TreeNode>
-        );
-      }
-      return (
-        <TreeNode
-          title={
-            <span>
-              <span>{item.name}</span>
-              <span style={{ float: 'right' }}>
-                {item.menuType === 1 ? (
-                  <Tag color="magenta">菜单</Tag>
-                ) : (
-                  <Tag color="cyan">按钮</Tag>
-                )}
-              </span>
-            </span>
-          }
-          key={item.id}
-          dataRef={item}
-        />
-      );
     });
   };
 
@@ -132,7 +102,7 @@ export default class extends BaseComponent {
       selectType: 'checkbox',
       showNum: true,
       isScroll: true,
-      selectedRowKeys: rows.map((item) => item.rowKey),
+      selectedRowKeys: rows.map((item) => item.id),
       onChange: ({ pageNum, pageSize }) => {
         dispatch({
           type: 'role/getPageInfo',
@@ -186,12 +156,11 @@ export default class extends BaseComponent {
       onOk: () => {
         const { record, checkedKeys } = this.state;
         const { id } = record;
-        const { checked } = checkedKeys;
         dispatch({
           type: 'role/distributeMenus',
           payload: {
             roleId: id,
-            checkedKeys: checked,
+            checkedKeys,
             success: () => {
               this.setState({
                 record: null,
@@ -211,9 +180,10 @@ export default class extends BaseComponent {
       defaultExpandAll: true,
       blockNode: true,
       onCheck: (checkedKeys) => {
-        this.setState({ checkedKeys });
+        this.setState({ checkedKeys: checkedKeys.checked });
       },
       checkedKeys,
+      treeData: dig(menus)
     };
 
     return (
@@ -222,13 +192,13 @@ export default class extends BaseComponent {
           <Toolbar
             appendLeft={
               <Button.Group>
-                <Button type="primary" icon="plus" onClick={this.onAdd}>
+                <Button type="primary" icon={<PlusOutlined/>} onClick={this.onAdd}>
                   新增
                 </Button>
                 <Button
                   disabled={!rows.length}
                   onClick={(e) => this.onDelete(rows)}
-                  icon="delete"
+                  icon={<DeleteOutlined/>}
                 >
                   删除
                 </Button>
@@ -246,7 +216,7 @@ export default class extends BaseComponent {
         </Footer>
         <ModalForm {...modalFormProps} />
         <Modal {...distributeModalProps}>
-          <Tree {...treeProps}>{this.renderTreeNodes(menus)}</Tree>
+          <Tree {...treeProps}></Tree>
         </Modal>
       </Layout>
     );

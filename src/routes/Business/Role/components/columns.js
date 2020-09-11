@@ -1,9 +1,8 @@
 import React from 'react';
+import { EditOutlined,UnlockOutlined, DeleteOutlined } from '@ant-design/icons';
 import DataTable from 'components/DataTable';
-import Icon from 'components/Icon';
 import Button from 'components/Button';
 import AuthWrapper from 'components/AuthWrapper';
-import { Link } from 'dva/router';
 import { formatDateTime } from '@/utils/tool';
 
 export default (self) => [
@@ -50,8 +49,8 @@ export default (self) => [
           <Button
             size="small"
             type="primary"
-            icon="edit"
-            onClick={(e) => self.onUpdate(record)}
+            icon={<EditOutlined />}
+            onClick={() => self.onUpdate(record)}
           >
             编辑
           </Button>
@@ -59,8 +58,8 @@ export default (self) => [
             <Button
               size="small"
               type="danger"
-              icon="delete"
-              onClick={(e) => self.onDelete(record)}
+              icon={<DeleteOutlined />}
+              onClick={() => self.onDelete(record)}
             >
               删除
             </Button>
@@ -68,8 +67,8 @@ export default (self) => [
           <Button
             size="small"
             type="primary"
-            icon="lock"
-            onClick={(e) => self.onDistribute(record)}
+            icon={<UnlockOutlined />}
+            onClick={() => self.onDistribute(record)}
           >
             权限
           </Button>

@@ -56,6 +56,10 @@ export default class BasicLayout extends React.PureComponent {
     props.dispatch({
       type: 'global/getMenu'
     });
+    
+    props.dispatch({
+      type: 'global/getPermission',
+    });
   }
 
   componentDidMount() {

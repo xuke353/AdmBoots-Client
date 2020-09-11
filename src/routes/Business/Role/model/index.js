@@ -23,17 +23,6 @@ export default modelEnhance({
           dispatch({
             type: 'init',
           });
-          // //初始化权限
-          // dispatch({
-          //   type: '@request',
-          //   payload: {
-          //     valueField: 'permission',
-          //     url: '/v1/users/permission',
-          //     data: { pathName: pathname },
-          //     method: 'POST',
-          //     afterResponse: (resp) => resp.data,
-          //   },
-          // });
         }
       });
     },
@@ -60,7 +49,7 @@ export default modelEnhance({
         type: '@request',
         payload: {
           valueField: 'pageData',
-          url: '/v1/roles/getList',
+          url: '/v1/roles',
           pageInfo: pageData,
           method: 'GET',
         },
@@ -75,8 +64,9 @@ export default modelEnhance({
         type: '@request',
         payload: {
           notice: true,
-          url: '/v1/roles/save',
+          url: '/v1/roles',
           data: values,
+          method: 'POST',
         },
       });
 
@@ -89,14 +79,13 @@ export default modelEnhance({
     // 修改
     *update({ payload }, { call, put, select, take }) {
       const { record, values, success } = payload;
-      values.id = record.id;
       const { pageData } = yield select((state) => state.role);
       // put是非阻塞的 put.resolve是阻塞型的
       yield put.resolve({
         type: '@request',
         payload: {
           notice: true,
-          url: `/v1/roles/update`,
+          url: `/v1/roles/${record.id}`,
           data: values,
           method: 'PUT',
         },
@@ -116,8 +105,8 @@ export default modelEnhance({
         type: '@request',
         payload: {
           notice: true,
-          url: '/v1/roles/delete',
-          data: records.map((item) => item.rowKey),
+          url: '/v1/roles',
+          data: records.map((item) => item.id),
           method: 'DELETE',
         },
       });
@@ -134,7 +123,7 @@ export default modelEnhance({
         afterResponse: (resp) => resp.data,
         payload: {
           valueField: 'menus',
-          url: '/v1/menus/getSimpleMenus',
+          url: '/v1/menus/activeMenus',
           method: 'GET',
         },
       });

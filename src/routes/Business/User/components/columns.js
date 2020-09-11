@@ -2,9 +2,9 @@ import React from 'react';
 import DataTable from 'components/DataTable';
 import Icon from 'components/Icon';
 import Button from 'components/Button';
-import { Link } from 'dva/router';
 import { Badge, Tooltip } from 'antd';
 import { formatDateTime } from '@/utils/tool';
+import { EditOutlined,RedoOutlined, DeleteOutlined } from '@ant-design/icons';
 
 export default (self, roles) => [
   {
@@ -41,7 +41,7 @@ export default (self, roles) => [
   },
   {
     title: '角色',
-    name: 'roleOfUsers',
+    name: 'roles',
     tableItem: {
       onCell: () => {
         return {
@@ -125,24 +125,24 @@ export default (self, roles) => [
           <Button
             size="small"
             type="primary"
-            icon="edit"
-            onClick={(e) => self.onUpdate(record)}
+            icon={<EditOutlined />}
+            onClick={() => self.onUpdate(record)}
           >
             编辑
           </Button>
           <Button
             size="small"
             type="danger"
-            icon="delete"
-            onClick={(e) => self.onDelete(record)}
+            icon={<DeleteOutlined />}
+            onClick={() => self.onDelete(record)}
           >
             删除
           </Button>
           <Button
             size="small"
             type="primary"
-            icon="redo"
-            onClick={(e) => self.onResetPassword(record)}
+            icon={<RedoOutlined />}
+            onClick={() => self.onResetPassword(record)}
           >
             重置密码
           </Button>
