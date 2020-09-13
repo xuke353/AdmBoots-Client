@@ -1,6 +1,5 @@
-import modelEnhance from '@/utils/modelEnhance';
 import PageHelper from '@/utils/pageHelper';
-import { getPageInfo, operJob, addJob, getLogPageInfo } from '../service';
+import { getPageInfo, operJob, addJob, getLogPageInfo,updateJob } from '../service';
 import objectAssign from 'object-assign';
 /**
  * 当第一次加载完页面时为true
@@ -12,7 +11,7 @@ export default {
   namespace: 'job',
 
   state: {
-    pageData: PageHelper.create(),
+    pageData: {},
     logPageData: PageHelper.create(),
   },
 
@@ -31,153 +30,108 @@ export default {
 
   effects: {
     // 进入页面加载
-    *init({ payload }, { call, put, select }) {
-      const { pageData } = yield select((state) => state.job);
+    *init({ payload },{ call, put}) {
       yield put({
         type: 'getPageInfo',
-        payload: {
-          pageData: pageData.startPage(1, 20),
-        },
       });
     },
     // 获取分页数据
     *getPageInfo({ payload }, { call, put }) {
-      const { pageData } = payload;
-      const { status, message, data } = yield call(
-        getPageInfo,
-        PageHelper.requestFormat(pageData)
-      );
+      const { status, data } = yield call(getPageInfo);
+      // const newPageData = objectAssign(
+      //   PageHelper.create(),
+      //   pageData,
+      //   PageHelper.responseFormat({ data })
+      // );
       if (status) {
-        const newPageData = objectAssign(
-          PageHelper.create(),
-          pageData,
-          PageHelper.responseFormat({ data })
-        );
         yield put({
           type: 'getPageInfoSuccess',
-          payload: newPageData,
+          payload: {list: data},
         });
       }
     },
     // 保存 之后查询分页
-    *save({ payload }, { call, put, select, take }) {
+    *save({ payload }, { call, put, select }) {
       const { values, success } = payload;
-      const { pageData } = yield select((state) => state.job);
       const { status } = yield call(addJob, values);
       if (status) {
         success();
         yield put({
           type: 'getPageInfo',
-          payload: { pageData: pageData.startPage(1, 20) },
         });
       }
     },
     // 修改
-    *update({ payload }, { call, put, select, take }) {
-      const { record, values, success } = payload;
-      values.id = record.id;
-      const { pageData } = yield select((state) => state.job);
-      const { status } = yield call(addJob, values);
+    *update({ payload }, { call, put, select }) {
+      const { values, success } = payload;
+      const { status } = yield call(updateJob, values);
       if (status) {
         success();
         yield put({
           type: 'getPageInfo',
-          payload: { pageData: pageData.startPage(1, 20) },
         });
       }
     },
     // 删除
     *remove({ payload }, { call, put, select }) {
       const { record, success } = payload;
-      const { pageData } = yield select((state) => state.job);
       const { status } = yield call(operJob, {
-        querys: { jobGroup: record.jobGroup, jobName: record.jobName },
-        res: 'remove',
+        data: { groupName: record.groupName, jobName: record.jobName },
+        template: 'remove',
       });
       if (status) {
         success();
         yield put({
           type: 'getPageInfo',
-          payload: { pageData: pageData.startPage(1, 20) },
-        });
-      }
-    },
-    // 开启任务
-    *start({ payload }, { call, put, select }) {
-      const { record, success } = payload;
-      const { pageData } = yield select((state) => state.job);
-      const { status } = yield call(operJob, {
-        querys: { jobGroup: record.jobGroup, jobName: record.jobName },
-        res: 'start',
-      });
-      if (status) {
-        success();
-        yield put({
-          type: 'getPageInfo',
-          payload: { pageData: pageData.startPage(1, 20) },
         });
       }
     },
     // 暂停任务
     *pause({ payload }, { call, put, select }) {
       const { record, success } = payload;
-      const { pageData } = yield select((state) => state.job);
       const { status } = yield call(operJob, {
-        querys: { jobGroup: record.jobGroup, jobName: record.jobName },
-        res: 'pause',
+        data: { groupName: record.groupName, jobName: record.jobName },
+        template: 'pause',
       });
       if (status) {
         success();
         yield put({
           type: 'getPageInfo',
-          payload: { pageData: pageData.startPage(1, 20) },
         });
       }
     },
     // 立即执行任务
     *execute({ payload }, { call, put, select }) {
       const { record, success } = payload;
-      const { pageData } = yield select((state) => state.job);
       const { status } = yield call(operJob, {
-        querys: { jobGroup: record.jobGroup, jobName: record.jobName },
-        res: 'execute',
+        data: { groupName: record.groupName, jobName: record.jobName },
+        template: 'run',
       });
       if (status) {
         success();
         yield put({
           type: 'getPageInfo',
-          payload: { pageData: pageData.startPage(1, 20) },
         });
       }
     },
     // 恢复暂停的任务
     *resume({ payload }, { call, put, select }) {
       const { record, success } = payload;
-      const { pageData } = yield select((state) => state.job);
       const { status } = yield call(operJob, {
-        querys: { jobGroup: record.jobGroup, jobName: record.jobName },
-        res: 'resume',
+        data: { groupName: record.groupName, jobName: record.jobName },
+        template: 'resume',
       });
       if (status) {
         success();
         yield put({
           type: 'getPageInfo',
-          payload: { pageData: pageData.startPage(1, 20) },
         });
       }
     },
-    // 查看日志
-    *getLog({ payload }, { call, put, select }) {
-      const { record, success } = payload;
-      const { status } = yield call(getLogs, record.id);
-      if (status) {
-        success();
-      }
-    },
-
+    //执行记录
     *getLogPageInfo({ payload }, { call, put }) {
       const { pageData } = payload;
-      const { status, message, data } = yield call(
+      const { status, data } = yield call(
         getLogPageInfo,
         PageHelper.requestFormat(pageData)
       );

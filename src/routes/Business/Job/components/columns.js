@@ -1,14 +1,13 @@
 import React from 'react';
 import DataTable from 'components/DataTable';
 import Button from 'components/Button';
-import { Link } from 'dva/router';
-import { Badge, Tooltip, Icon, Dropdown, Menu } from 'antd';
+import { Badge, Tooltip, Dropdown, Menu } from 'antd';
 import { formatDateTime } from '@/utils/tool';
-import moment from 'moment';
+import { DownOutlined} from '@ant-design/icons';
 
-export default (self, triggerType) => [
+export default (self, isUpdating) => [
   {
-    title: '任务名称',
+    title: '作业名称',
     name: 'jobName',
     tableItem: {},
     searchItem: {
@@ -16,90 +15,61 @@ export default (self, triggerType) => [
       placeholder: '',
     },
     formItem: {
-      rules: [{ required: true, message: 'Please input 任务名称!' }],
+      disabled: isUpdating,
+      rules: [{ required: true}],
     },
   },
   {
-    title: '任务组名',
-    name: 'jobGroup',
+    title: '组名',
+    name: 'groupName',
     tableItem: {},
     formItem: {
-      rules: [{ required: true, message: 'Please input 任务组名!' }],
-    },
-  },
-  {
-    title: '开始时间',
-    name: 'beginTime',
-    tableItem: {
-      hide: true,
-      render: (text) => formatDateTime(text, 'YYYY-MM-DD HH:mm'),
-    },
-    formItem: {
-      type: 'datetime',
-      showTime: true,
-    },
-  },
-  {
-    title: '结束时间',
-    name: 'endTime',
-    tableItem: {
-      hide: true,
-      render: (text) => formatDateTime(text, 'YYYY-MM-DD HH:mm'),
-    },
-    formItem: {
-      type: 'datetime',
-      showTime: true,
-    },
-  },
-  {
-    title: '触发类型',
-    name: 'triggerType',
-    dict: [
-      { code: 1, codeName: 'Cron' },
-      { code: 2, codeName: 'Simple' },
-    ],
-    tableItem: { hide: true },
-    formItem: {
-      type: 'select',
-      initialValue: 1,
-      onChange: (form, value) => self.triggerTypeChange(value),
+      disabled: isUpdating,
+      rules: [{ required: true}],
     },
   },
   {
     title: 'Cron表达式',
     name: 'cron',
-    tableItem: { hide: true },
+    tableItem: {},
     formItem: {
-      disabled: triggerType === 2,
-      rules: [{ required: true, message: 'Please input 执行间隔!' }],
+      rules: [{ required: true}],
     },
   },
   {
     title: '状态',
-    name: 'displayState',
+    name: 'status',
     tableItem: {
-      render: (text) => {
+      render: (t) => {
         let status = '';
-        switch (text) {
-          case '正常':
+        let text ='';
+        switch (t) {
+          case 0:
             status = 'processing';
+            text = '正常';
             break;
-          case '暂停':
+          case 1:
             status = 'warning';
+            text = '暂停';
             break;
-          case '完成':
+          case 2:
             status = 'success';
+            text = '完成';
             break;
-          case '异常':
+          case 3:
             status = 'error';
+            text = '错误';
             break;
-          case '阻塞':
+          case 4:
             status = 'error';
+            text = '阻塞';
             break;
-          case '不存在':
+          case 5:
             status = 'default';
+            text = '不存在';
             break;
           default:
+            text = '未启动';
             status = 'default';
         }
         return <Badge status={status} text={text} />;
@@ -107,47 +77,17 @@ export default (self, triggerType) => [
     },
   },
   {
-    title: '上次执行时间',
+    title: '最后执行时间',
     name: 'previousFireTime',
     tableItem: {
       render: (text) => formatDateTime(text, 'YYYY-MM-DD HH:mm'),
     },
   },
   {
-    title: '执行间隔',
-    name: 'intervalSecond',
-    tableItem: { hide: true },
-    formItem: {
-      type: 'number',
-      rules: [{ required: true, message: 'Please input 执行间隔!' }],
-      placeholder: '请输入执行间隔，单位：秒',
-      min: 1,
-      disabled: triggerType === 1,
-    },
-  },
-  {
-    title: 'Job间隔',
-    name: 'interval',
-    tableItem: { hide: true },
-  },
-  {
     title: '下次执行时间',
     name: 'nextFireTime',
     tableItem: {
       render: (text) => formatDateTime(text, 'YYYY-MM-DD HH:mm'),
-    },
-  },
-
-  {
-    title: '执行次数',
-    name: 'runTimes',
-    tableItem: { hide: true },
-    formItem: {
-      type: 'number',
-      placeholder: '请输入执行次数，0不限制次数',
-      rules: [{ required: true, message: 'Please input 执行间隔!' }],
-      disabled: triggerType === 1,
-      initialValue: 0,
     },
   },
   {
@@ -176,12 +116,13 @@ export default (self, triggerType) => [
     name: 'headers',
     tableItem: { hide: true },
     formItem: {
+      type: 'textarea',
       placeholder: '格式：{"Authorization":"userpassword.."}',
     },
   },
   {
     title: '请求参数',
-    name: 'requestParameters',
+    name: 'requestParams',
     tableItem: { hide: true },
     formItem: {
       type: 'textarea',
@@ -190,7 +131,7 @@ export default (self, triggerType) => [
   },
   {
     title: '任务描述',
-    name: 'description',
+    name: 'describe',
     tableItem: {
       onCell: () => {
         return {
@@ -214,149 +155,29 @@ export default (self, triggerType) => [
   {
     title: '操作',
     tableItem: {
-      width: 150,
-      render: (text, record) => {
-        const menus = [
-          {
-            id: 'start',
-            children: (
-              <a
-                key="start"
-                onClick={(e) => self.handleMenuClick('start', record)}
-              >
-                启动
-              </a>
-            ),
-            hidden: !record.options.includes('start'),
-          },
-          {
-            id: 'resume',
-            children: (
-              <a
-                key="resume"
-                onClick={(e) => self.handleMenuClick('resume', record)}
-              >
-                恢复
-              </a>
-            ),
-            hidden: !record.options.includes('resume'),
-          },
-          {
-            id: 'pause',
-            children: (
-              <a
-                key="pause"
-                onClick={(e) => self.handleMenuClick('pause', record)}
-              >
-                暂停
-              </a>
-            ),
-            hidden: !record.options.includes('pause'),
-          },
-          {
-            id: 'execute',
-            children: (
-              <a
-                key="execute"
-                onClick={(e) => self.handleMenuClick('execute', record)}
-              >
-                执行
-              </a>
-            ),
-            hidden: !record.options.includes('execute'),
-          },
-          {
-            id: 'update',
-            children: (
-              <a
-                key="update"
-                onClick={(e) => self.handleMenuClick('update', record)}
-              >
-                修改
-              </a>
-            ),
-            hidden: !record.options.includes('update'),
-          },
-          {
-            id: 'remove',
-            children: (
-              <a key="remove" onClick={() => self.onDelete(record)}>
-                删除
-              </a>
-            ),
-            hidden: !record.options.includes('remove'),
-          },
-          {
-            id: 'getLog',
-            children: (
-              <a
-                key="getLog"
-                onClick={(e) => self.handleMenuClick('getLog', record)}
-              >
-                日志
-              </a>
-            ),
-          },
-        ];
-        return (
-          // <DropdownMenu
-          //   key={record.id}
-          //   menus={menus}
-          //   primaryLength={2}
-          //   id={record.id}
-          // />
-          <a>aa</a>
-        );
-        // <DataTable.Oper>
-        //   <Button
-        //     hidden={!record.options.includes('start')}
-        //     size="small"
-        //     onClick={(e) => self.handleMenuClick('start', record)}
-        //   >
-        //     启动
-        //   </Button>
-        //   <Button
-        //     hidden={!record.options.includes('resume')}
-        //     size="small"
-        //     onClick={(e) => self.handleMenuClick('resume', record)}
-        //   >
-        //     恢复
-        //   </Button>
-        //   <Button
-        //     hidden={!record.options.includes('pause')}
-        //     size="small"
-        //     onClick={(e) => self.handleMenuClick('pause', record)}
-        //   >
-        //     暂停
-        //   </Button>
-        //   <Dropdown
-        //     overlay={
-        //       <Menu onClick={(e) => self.handleMenuClick(e.key, record)}>
-        //         {record.options.includes('execute') ? (
-        //           <Menu.Item key="execute">执行</Menu.Item>
-        //         ) : (
-        //           <div></div>
-        //         )}
-        //         {record.options.includes('update') ? (
-        //           <Menu.Item key="update">修改</Menu.Item>
-        //         ) : (
-        //           <div></div>
-        //         )}
-        //         {record.options.includes('remove') ? (
-        //           <Menu.Item key="delete">删除</Menu.Item>
-        //         ) : (
-        //           <div></div>
-        //         )}
-        //         <Menu.Item key="getLog">日志</Menu.Item>
-        //       </Menu>
-        //     }
-        //   >
-        //     <Button>
-        //       更多 <Icon type="down" />
-        //     </Button>
-        //   </Dropdown>
-        // </DataTable.Oper>
-      },
-    },
+      width: 180,
+      render: (text, record) => (
+        <DataTable.Oper className="col-align-right">
+          <Button
+            size="small"
+            type="primary"
+            onClick={() => self.handleMenuClick('getLog', record)}>
+            执行记录
+          </Button>
+          <Dropdown overlay={<Menu onClick={({item, key}) => self.handleMenuClick(key, record)}>
+                              {record.options.some(s => s === 'pause') ? <Menu.Item key="pause">暂停任务</Menu.Item> : null}
+                              {record.options.some(s => s === 'resume') ? <Menu.Item key="resume">开启任务</Menu.Item> : null}
+                              {record.options.some(s => s === 'execute') ? <Menu.Item key="execute">立即执行</Menu.Item> : null}
+                              <Menu.Item key="update">修改任务</Menu.Item>
+                              <Menu.Item key="remove">删除任务</Menu.Item>
+                              <Menu.Item key="detail">任务详情</Menu.Item>
+                            </Menu>} trigger={['click']}>
+          <Button size="small" type="primary">
+            操作 <DownOutlined />
+          </Button>
+        </Dropdown>
+        </DataTable.Oper>
+      ),
   },
+},
 ];

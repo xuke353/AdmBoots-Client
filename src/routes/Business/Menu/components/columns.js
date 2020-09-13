@@ -2,8 +2,7 @@ import React from 'react';
 import DataTable from 'components/DataTable';
 import Icon from 'components/Icon';
 import Button from 'components/Button';
-import { Link } from 'dva/router';
-import { Badge, Tag, Tooltip, Switch, Slider, InputNumber, Input } from 'antd';
+import { Badge, Tag, Tooltip, Switch } from 'antd';
 import SliderInput from './SliderInput';
 import { formatDateTime } from '@/utils/tool';
 
@@ -71,7 +70,6 @@ export default (self, casOptions) => [
     },
     formItem: {
       type: 'radio',
-      buttonStyle: 'solid',
       initialValue: 1,
     },
   },
@@ -88,11 +86,11 @@ export default (self, casOptions) => [
     },
   },
   {
-    title: '路由/API',
-    name: 'link',
+    title: '资源标识',
+    name: 'uri',
     tableItem: {},
     formItem: {
-      rules: [{ required: true, message: '请输入路由或API地址!' }],
+      rules: [{ required: true, message: '请输入路由或权限标识!' }],
       initialValue: '/',
     },
   },
@@ -174,11 +172,11 @@ export default (self, casOptions) => [
       width: 180,
       render: (text, record) => (
         <DataTable.Oper>
-          <Button tooltip="修改" onClick={(e) => self.handleUpdate(record)}>
-            <Icon type="edit" />
+          <Button tooltip="修改" onClick={() => self.handleUpdate(record)}>
+            <Icon type="EditOutlined" antd/>
           </Button>
-          <Button tooltip="删除" onClick={(e) => self.onDelete(record)}>
-            <Icon type="trash" />
+          <Button tooltip="删除" onClick={() => self.onDelete(record)}>
+            <Icon type="DeleteOutlined" antd/>
           </Button>
         </DataTable.Oper>
       ),

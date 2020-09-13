@@ -1,4 +1,3 @@
-import modelEnhance from '@/utils/modelEnhance';
 import PageHelper from '@/utils/pageHelper';
 import {
   getPageInfo,
@@ -48,7 +47,7 @@ export default {
     // 获取分页数据
     *getPageInfo({ payload }, { call, put }) {
       const { pageData } = payload;
-      const { status, message, data } = yield call(
+      const { status, data } = yield call(
         getPageInfo,
         PageHelper.requestFormat(pageData)
       );
@@ -66,7 +65,7 @@ export default {
     },
     // 获取菜单级联下拉数据源
     *getCascadeMenus({ payload }, { call, put }) {
-      const { status, message, data } = yield call(getCascadeOptions);
+      const { status, data } = yield call(getCascadeOptions);
       if (status) {
         yield put({
           type: 'getCascadeMenusSuccess',
@@ -75,7 +74,7 @@ export default {
       }
     },
     // 保存 之后查询分页
-    *save({ payload }, { call, put, select, take }) {
+    *save({ payload }, { call, put, select }) {
       const { values, success } = payload;
       const { pageData } = yield select((state) => state.menu);
       const { status } = yield call(saveMenu, values);
@@ -88,11 +87,10 @@ export default {
       }
     },
     // 修改
-    *update({ payload }, { call, put, select, take }) {
+    *update({ payload }, { call, put, select }) {
       const { record, values, success } = payload;
-      values.id = record.id;
       const { pageData } = yield select((state) => state.menu);
-      const { status } = yield call(updateMenu, values);
+      const { status } = yield call(updateMenu, {id:record.id, data: values});
       if (status) {
         success();
         yield put({
@@ -104,7 +102,7 @@ export default {
     // 删除
     *remove({ payload }, { call, put, select }) {
       const { records, success } = payload;
-      const ids = records.map((item) => item.rowKey);
+      const ids = records.map((item) => item.id);
       const { pageData } = yield select((state) => state.menu);
       const { status } = yield call(deleteMenu, ids);
       if (status) {

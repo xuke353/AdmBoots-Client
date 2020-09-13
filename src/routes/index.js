@@ -1,6 +1,7 @@
 import { createRoutes } from '@/utils/core';
 import BasicLayout from '@/layouts/BasicLayout';
 import UserLayout from '@/layouts/UserLayout';
+import CardLayout from '@/layouts/CardLayout';
 import NotFound from './Pages/404';
 import Login from './Login';
 import Dashboard from './Dashboard';
@@ -25,6 +26,20 @@ const routesConfig = app => [
     component: UserLayout,
     childRoutes: [
       Login(app),
+      NotFound()
+    ]
+  },
+  {
+    path: '/a',
+    title: '三方系统',
+    component: CardLayout,
+    indexRoute: '/a/role',
+    childRoutes: [
+      //Dashboard(app),
+      //Role(app),
+      //User(app),
+     // Menu(app),
+      //Job(app),
       NotFound()
     ]
   },

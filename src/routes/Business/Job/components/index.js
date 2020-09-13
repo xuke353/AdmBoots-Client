@@ -3,14 +3,13 @@ import { connect } from 'dva';
 import { Layout, Button, message, Modal } from 'antd';
 import BaseComponent from 'components/BaseComponent';
 import Toolbar from 'components/Toolbar';
-import SearchBar from 'components/SearchBar';
 import DataTable from 'components/DataTable';
 import { ModalForm } from 'components/Modal';
 import createColumns from './columns';
+import { PlusOutlined, ReloadOutlined } from '@ant-design/icons';
 import './index.less';
 import LogPage from './LogPage';
-const { Content, Header, Footer } = Layout;
-const Pagination = DataTable.Pagination;
+const { Content, Header } = Layout;
 
 @connect(({ job, loading }) => ({
   job,
@@ -20,11 +19,15 @@ export default class extends BaseComponent {
   state = {
     record: null,
     visible: false,
-    expandedRowKeys: [],
-    triggerType: 1,
     logModalVisible: false,
+    preview: false,
   };
 
+  handleReload = () => {
+    this.props.dispatch({
+      type: 'job/getPageInfo',
+    });
+  };
   handleDelete = (records) => {
     this.props.dispatch({
       type: 'job/remove',
@@ -36,39 +39,12 @@ export default class extends BaseComponent {
       },
     });
   };
-  handleUpdate = (record) => {
-    this.setState({
-      record,
-      visible: true,
-      currentIsMenu: record.isMenu,
-      triggerType: record.triggerType,
-    });
-  };
-
-  triggerTypeChange = (value) => {
-    this.setState({ triggerType: value });
-  };
-
   handleMenuClick = (key, record) => {
     switch (key) {
       case 'update':
-        this.handleUpdate(record);
+        this.onUpdate(record);
         break;
-      case 'start':
-        {
-          this.props.dispatch({
-            type: 'job/start',
-            payload: {
-              record,
-              success: () => {
-                message.success('任务已开启');
-              },
-            },
-          });
-        }
-        break;
-      case 'pause':
-        {
+      case 'pause':      
           this.props.dispatch({
             type: 'job/pause',
             payload: {
@@ -77,8 +53,7 @@ export default class extends BaseComponent {
                 message.success('任务已暂停');
               },
             },
-          });
-        }
+          });       
         break;
       case 'resume':
         this.props.dispatch({
@@ -86,12 +61,12 @@ export default class extends BaseComponent {
           payload: {
             record,
             success: () => {
-              message.success('任务已恢复');
+              message.success('启动成功');
             },
           },
         });
         break;
-      case 'execute': {
+      case 'execute': 
         this.props.dispatch({
           type: 'job/execute',
           payload: {
@@ -101,11 +76,17 @@ export default class extends BaseComponent {
             },
           },
         });
-
         break;
-      }
+        case 'remove': 
+          this.onDelete(record);
+        break;
       case 'getLog':
         this.setState({ logModalVisible: true, record });
+        break;
+      case 'detail':
+        this.setState({ preview: true, visible: true, record });
+        break;
+      default:
         break;
     }
   };
@@ -115,36 +96,11 @@ export default class extends BaseComponent {
     const {
       record,
       visible,
-      expandedRowKeys,
-      triggerType,
       logModalVisible,
+      preview,
     } = this.state;
-    const columns = createColumns(this, triggerType);
+    const columns = createColumns(this);
 
-    const searchBarProps = {
-      columns,
-      onSearch: (values) => {
-        dispatch({
-          type: 'job/getPageInfo',
-          payload: {
-            pageData: pageData.filter(values).jumpPage(1, 20),
-          },
-        });
-      },
-    };
-    const expandedTableProps = {
-      columns: columns
-        .filter((f) => f.tableItem)
-        .filter((t) => t.tableItem.hide),
-      rowKey: 'id',
-      dataItems: pageData,
-      alternateColor: false,
-      className: 'table-row',
-    };
-    const expandedRowRender = (record) => {
-      const expandedData = { list: [record] };
-      return <DataTable {...expandedTableProps} dataItems={expandedData} />;
-    };
     const dataTableProps = {
       loading,
       columns: columns
@@ -153,17 +109,7 @@ export default class extends BaseComponent {
       rowKey: 'id',
       dataItems: pageData,
       isScroll: true,
-      alternateColor: false,
-      className: 'table-row',
-      expandedRowRender: expandedRowRender,
-      onExpand: (expanded, record) => {
-        if (expanded) {
-          this.setState({ expandedRowKeys: [record.id] });
-        } else {
-          this.setState({ expandedRowKeys: [] });
-        }
-      },
-      expandedRowKeys,
+      showNum: true,
       onChange: ({ pageNum, pageSize }) => {
         dispatch({
           type: 'job/getPageInfo',
@@ -177,21 +123,21 @@ export default class extends BaseComponent {
       loading,
       record,
       visible,
-      columns: columns
-        .filter((f) => f.formItem)
-        .filter((t) => !t.formItem.disabled),
+      columns: createColumns(this, record),
       modalOpts: {
         width: 700,
       },
+      preview,
       onCancel: () => {
         this.setState({
           record: null,
           visible: false,
+          preview: false,
         });
       },
       // 新增、修改都会进到这个方法中，
       // 可以使用主键或是否有record来区分状态
-      onSubmit: (values) => {
+      onSubmit: preview ? null : (values) => {
         const { record } = this.state;
         dispatch({
           type: record ? 'job/update' : 'job/save',
@@ -211,39 +157,38 @@ export default class extends BaseComponent {
     };
     const logModalProps = {
       destroyOnClose: true,
-      title: `调度日志 [${record ? record.jobGroup : ''}.${
-        record ? record.jobName : ''
-      }]`,
+      title: `调度日志 [${record ? record.groupName : ''}.${record ? record.jobName : ''}]`,
       visible: logModalVisible,
       onCancel: () => {
         this.setState({ logModalVisible: false });
       },
       footer: null,
       width: '90%',
+      style: {top: 10}
     };
-    const jobKey = record ? `${record.jobGroup}.${record.jobName}` : '';
+    const jobKey = record ? `${record.groupName}.${record.jobName}` : '';
     return (
       <Layout className="full-layout crud-page">
         <Header>
           <Toolbar
             appendLeft={
               <Button.Group>
-                <Button type="primary" icon="plus" onClick={this.onAdd}>
+              <Button type="primary" icon={<PlusOutlined/>} onClick={this.onAdd}>
                   新增
-                </Button>
+                </Button>                
               </Button.Group>
-            }
+            }        
           >
-            <SearchBar group="abc" {...searchBarProps} />
-          </Toolbar>
+        <Button loading={loading} onClick={() => this.handleReload()} icon={<ReloadOutlined/>}>刷新</Button>
+        </Toolbar>
         </Header>
         <Content>
           <DataTable {...dataTableProps} />
         </Content>
-        <Footer>
+        {/* <Footer>
           <Pagination {...dataTableProps} />
-        </Footer>
-        <ModalForm {...modalFormProps} />
+        </Footer> */}
+        <ModalForm {...modalFormProps}/>
         <Modal {...logModalProps}>
           <LogPage jobKey={jobKey} />
         </Modal>
