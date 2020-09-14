@@ -172,16 +172,17 @@ class NavBar extends PureComponent {
           <li className="dropdown">
             <Popover
               placement="bottomRight"
-              title={`WELCOME ${user.userName}`}
+              title={`WELCOME ${user.name}`}
               overlayClassName={cx('navbar-popup', { [theme]: !!theme })}
               content={<UserDropDown onDropdownMenuClick={this.onDropdownMenuClick}/>}
               trigger="click"
             >
               <a className="dropdown-toggle">
-                <Badge dot>
-                  <Avatar src={require('assets/images/avatar.jpg')}>
-                    {user.userName}
-                  </Avatar>
+                <Badge dot offset={[8, 0]}>
+                  {/* <Avatar style={{ backgroundColor: '#f56a00', verticalAlign: 'middle' }}  gap={1}>
+                    {user.name}
+                  </Avatar> */}
+                  <b>{user.name}</b>
                 </Badge>
               </a>
             </Popover>

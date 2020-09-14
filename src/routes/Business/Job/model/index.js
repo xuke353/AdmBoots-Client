@@ -130,12 +130,13 @@ export default {
     },
     //执行记录
     *getLogPageInfo({ payload }, { call, put }) {
-      const { pageData } = payload;
+      const { pageData, success } = payload;
       const { status, data } = yield call(
         getLogPageInfo,
         PageHelper.requestFormat(pageData)
       );
       if (status) {
+        success();
         const newPageData = objectAssign(
           PageHelper.create(),
           pageData,

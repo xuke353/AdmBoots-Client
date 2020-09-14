@@ -1,6 +1,6 @@
 import React from 'react';
 import { connect } from 'dva';
-import { Layout, Button, message, Modal } from 'antd';
+import { Layout, Button, message } from 'antd';
 import BaseComponent from 'components/BaseComponent';
 import Toolbar from 'components/Toolbar';
 import DataTable from 'components/DataTable';
@@ -90,6 +90,22 @@ export default class extends BaseComponent {
         break;
     }
   };
+  onClick = jobKey => {
+    const { job } = this.props;
+    const { logPageData } = job;
+    this.props.dispatch({
+      type: 'job/getLogPageInfo',
+      payload: {
+        pageData: logPageData
+          .filter({ jobKey })
+          .jumpPage(1, 20)
+          .sortBy('beginTime desc'),
+      },
+    });
+  }
+  onLogPageCancel = () => {
+    this.setState({logModalVisible: false});
+  }
   render() {
     const { job, loading, dispatch } = this.props;
     const { pageData } = job;
@@ -155,18 +171,8 @@ export default class extends BaseComponent {
         });
       },
     };
-    const logModalProps = {
-      destroyOnClose: true,
-      title: `调度日志 [${record ? record.groupName : ''}.${record ? record.jobName : ''}]`,
-      visible: logModalVisible,
-      onCancel: () => {
-        this.setState({ logModalVisible: false });
-      },
-      footer: null,
-      width: '90%',
-      style: {top: 10}
-    };
     const jobKey = record ? `${record.groupName}.${record.jobName}` : '';
+    
     return (
       <Layout className="full-layout crud-page">
         <Header>
@@ -189,9 +195,8 @@ export default class extends BaseComponent {
           <Pagination {...dataTableProps} />
         </Footer> */}
         <ModalForm {...modalFormProps}/>
-        <Modal {...logModalProps}>
-          <LogPage jobKey={jobKey} />
-        </Modal>
+
+        {logModalVisible ? <LogPage jobKey={jobKey} onCancel={this.onLogPageCancel}/> : null}
       </Layout>
     );
   }
