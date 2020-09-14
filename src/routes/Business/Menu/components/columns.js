@@ -137,10 +137,6 @@ export default (self, casOptions) => [
   {
     title: '状态',
     name: 'isActive',
-    dict: [
-      { code: 1, codeName: '激活' },
-      { code: 0, codeName: '禁用' },
-    ],
     tableItem: {
       render: (text) => {
         return text ? (

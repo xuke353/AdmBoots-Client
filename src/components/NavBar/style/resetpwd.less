@@ -1,0 +1,57 @@
+@import '~antd/lib/style/themes/default.less';
+
+.register-page {
+  .register-form-button {
+    width: 100%;
+  }
+  .getCaptcha {
+    width: 100%;
+  }
+}
+
+.progress-pass.ant-progress {
+  .ant-progress-bg {
+    background-color: @warning-color;
+  }
+}
+
+.resetpwd-page {
+  background: #FFFFFF;
+  .login-form {
+    width: 368px;
+    margin: 0 auto;
+    .user-name {
+      margin: 26px 0 26px 0;
+      font-size: 28px;
+      text-align: center;
+      img {
+        width: 50px;
+        margin-right: 18px;
+      }
+      > * {
+        vertical-align: middle;
+      }
+    }
+    .login-form-forgot {
+      float: right;
+    }
+    .login-form-button {
+      width: 100%;
+    }
+    .new-user {
+      float: right;
+    }
+    a {
+      color: @primary-color;
+      &:hover {
+        color: tint(@primary-color);
+      }
+      &:active {
+        color: @primary-color;
+      }
+    }
+  }
+  .ant-spin-nested-loading > div > .ant-spin {
+    max-height: none;
+  }
+}

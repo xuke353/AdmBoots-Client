@@ -9,6 +9,7 @@ import Role from './Business/Role';
 import User from './Business/User';
 import Menu from './Business/Menu';
 import Job from './Business/Job';
+import MailSetting from './Business/MailSetting';
 /**
  * 主路由配置
  * 
@@ -54,6 +55,7 @@ const routesConfig = app => [
       User(app),
       Menu(app),
       Job(app),
+      MailSetting(app),
       NotFound()
     ]
   }

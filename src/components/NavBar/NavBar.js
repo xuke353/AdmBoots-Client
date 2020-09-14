@@ -1,19 +1,23 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { PureComponent } from 'react';
 import Icon from '../Icon';
-import { Popover, Badge, Avatar } from 'antd';
+import { Popover, Badge, Avatar, Modal } from 'antd';
 import { router } from 'dva';
 import cx from 'classnames';
 import './style/index.less';
 import logoImg from 'assets/images/logo.png';
 import SearchBox from './SearchBox';
+import ResetPwd from './ResetPwd';
 const { Link } = router;
+
 
 /**
  * 其本本局头部区域
  */
 class NavBar extends PureComponent {
   state = {
-    openSearchBox: false
+    openSearchBox: false,
+    openModifyPassword: false,
   };
 
   static defaultProps = {
@@ -64,8 +68,20 @@ class NavBar extends PureComponent {
     });
   };
 
+  onDropdownMenuClick = (itemName) => {
+    if (itemName === 'modifyPassword') {
+      this.setState({
+        openModifyPassword: true,
+      });
+    }
+  };
+  onCloseModifyPwd = () => {
+    this.setState({
+      openModifyPassword: false,
+    });
+  };
   render() {
-    const { openSearchBox } = this.state;
+    const { openSearchBox, openModifyPassword } = this.state;
     const {
       fixed,
       theme,
@@ -88,8 +104,8 @@ class NavBar extends PureComponent {
         <div className="navbar-branding">
           <Link className="navbar-brand" to="/">
             <img src={logoImg} alt="logo" />
-            <b>LANIF</b>
-            Admin
+            <b>Adm</b>
+            Boots
           </Link>
           <span className="toggle_sidemenu_l" onClick={onCollapseLeftSide}>
             <Icon type="lines" />
@@ -158,7 +174,7 @@ class NavBar extends PureComponent {
               placement="bottomRight"
               title={`WELCOME ${user.userName}`}
               overlayClassName={cx('navbar-popup', { [theme]: !!theme })}
-              content={<UserDropDown />}
+              content={<UserDropDown onDropdownMenuClick={this.onDropdownMenuClick}/>}
               trigger="click"
             >
               <a className="dropdown-toggle">
@@ -172,6 +188,17 @@ class NavBar extends PureComponent {
           </li>
         </ul>
         <SearchBox visible={openSearchBox} onClose={this.onCloseSearchBox} />
+        <Modal
+          className="div-modal"
+          visible={openModifyPassword}
+          title={null}
+          onCancel={this.onCloseModifyPwd}
+          footer={null}
+          destroyOnClose={true}
+          maskClosable={false}
+        >
+          <ResetPwd onClose={this.onCloseModifyPwd} user={user} />
+        </Modal>
       </header>
     );
   }
@@ -192,13 +219,13 @@ const UserDropDown = props => (
       </a>
     </li>
     <li className="list-group-item">
-      <a className="animated animated-short fadeInUp">
-        <Icon type="gear" /> 帐户设置
+      <a className="animated animated-short fadeInUp" onClick={() => props.onDropdownMenuClick('modifyPassword')}>
+        <Icon type="gear" /> 密码修改
       </a>
     </li>
     <li className="list-group-item">
       <a className="animated animated-short fadeInUp">
-        <Icon type="ring" /> 通知
+        <Icon type="ring" /> 关于
       </a>
     </li>
     <li className="list-group-item dropdown-footer">
