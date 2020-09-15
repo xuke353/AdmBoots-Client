@@ -138,7 +138,7 @@ export default class extends BaseComponent {
                   新增
                 </Button>
                 <Button
-                  disabled={!rows.length}
+                  disabled={!rows.length || rows.some(s => s.isMaster)}
                   onClick={() => this.onDelete(rows)}
                   icon={<DeleteOutlined/>}
                 >

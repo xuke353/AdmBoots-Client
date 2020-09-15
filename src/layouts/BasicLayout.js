@@ -225,7 +225,7 @@ export default class BasicLayout extends React.PureComponent {
             onExpandTopBar={this.onExpandTopBar}
             toggleSidebarHeader={this.toggleSidebarHeader}
             theme={theme.navbar}
-            user={user.userInfo}
+            user={user}
             isMobile={isMobile}
           />
         </Header>
@@ -241,7 +241,7 @@ export default class BasicLayout extends React.PureComponent {
             flatMenu={flatMenu}
             currentMenu={currentMenu}
             menu={menu}
-            user={user.userInfo}
+            user={user}
             isMobile={isMobile}
           />
           <Content>
