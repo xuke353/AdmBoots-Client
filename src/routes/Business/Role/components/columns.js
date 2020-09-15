@@ -4,6 +4,7 @@ import DataTable from 'components/DataTable';
 import Button from 'components/Button';
 import AuthWrapper from 'components/AuthWrapper';
 import { formatDateTime } from '@/utils/tool';
+import {PAGE_PATH} from '../index';
 
 export default (self) => [
   {
@@ -46,15 +47,17 @@ export default (self) => [
       width: 240,
       render: (text, record) => (
         <DataTable.Oper className="col-align-right">
-          <Button
-            size="small"
-            type="primary"
-            icon={<EditOutlined />}
-            onClick={() => self.onUpdate(record)}
-          >
-            编辑
-          </Button>
-          <AuthWrapper authorized="delete" menuRoute="/role">
+          <AuthWrapper authorized="update" menuRoute={PAGE_PATH}>
+            <Button
+              size="small"
+              type="primary"
+              icon={<EditOutlined />}
+              onClick={() => self.onUpdate(record)}
+            >
+              编辑
+            </Button>
+          </AuthWrapper>
+          <AuthWrapper authorized="delete" menuRoute={PAGE_PATH}>
             <Button
               size="small"
               type="danger"
@@ -64,14 +67,16 @@ export default (self) => [
               删除
             </Button>
           </AuthWrapper>
-          <Button
-            size="small"
-            type="primary"
-            icon={<UnlockOutlined />}
-            onClick={() => self.onDistribute(record)}
-          >
-            权限
-          </Button>
+          <AuthWrapper authorized="auth" menuRoute={PAGE_PATH}>
+            <Button
+              size="small"
+              type="primary"
+              icon={<UnlockOutlined />}
+              onClick={() => self.onDistribute(record)}
+            >
+              权限
+            </Button>
+          </AuthWrapper>
         </DataTable.Oper>
       ),
     },

@@ -9,6 +9,8 @@ import DataTable from 'components/DataTable';
 import { ModalForm } from 'components/Modal';
 import createColumns from './columns';
 import './index.less';
+import AuthWrapper from 'components/AuthWrapper';
+import {PAGE_PATH} from '../index';
 const { Content, Header, Footer } = Layout;
 const Pagination = DataTable.Pagination;
 
@@ -192,16 +194,20 @@ export default class extends BaseComponent {
           <Toolbar
             appendLeft={
               <Button.Group>
-                <Button type="primary" icon={<PlusOutlined/>} onClick={this.onAdd}>
-                  新增
-                </Button>
-                <Button
-                  disabled={!rows.length}
-                  onClick={(e) => this.onDelete(rows)}
-                  icon={<DeleteOutlined/>}
-                >
-                  删除
-                </Button>
+                <AuthWrapper authorized="add" menuRoute={PAGE_PATH}>
+                  <Button type="primary" icon={<PlusOutlined/>} onClick={this.onAdd}>
+                    新增
+                  </Button>
+                </AuthWrapper>
+                <AuthWrapper authorized="delete" menuRoute={PAGE_PATH}>
+                  <Button
+                    disabled={!rows.length}
+                    onClick={(e) => this.onDelete(rows)}
+                    icon={<DeleteOutlined/>}
+                  >
+                    删除
+                  </Button>
+                </AuthWrapper>
               </Button.Group>
             }
           >
