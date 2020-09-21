@@ -1,11 +1,11 @@
 {
-  "name": "dva-boot-admin",
+  "name": "admboots-client",
   "version": "3.0.0",
-  "description": "dva-boot-admin",
-  "homepage": "/dva-boot-admin",
+  "description": "AdmBoots-Client",
+  "homepage": "/adm-boots",
   "repository": {
     "type": "git",
-    "url": "git@github.com:LANIF-UI/dva-boot-admin.git"
+    "url": "git@github.com:xuke353/AdmBoots-Client.git"
   },
   "license": "MIT",
   "scripts": {
