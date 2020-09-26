@@ -10,7 +10,7 @@ import { ModalForm } from 'components/Modal';
 import createColumns from './columns';
 import './index.less';
 import AuthWrapper from 'components/AuthWrapper';
-import {PAGE_PATH} from '../index';
+import {PAGE_CODE} from '../index';
 const { Content, Header, Footer } = Layout;
 const Pagination = DataTable.Pagination;
 
@@ -65,11 +65,19 @@ export default class extends BaseComponent {
    */
   onDistribute = (record) => {
     const { menuIds } = record;
-    this.setState({
-      checkedKeys: menuIds,
-      record,
-      distributeModalVisible: true,
+    this.props.dispatch({
+      type: 'role/getMenus',
+      payload: {
+        success: () => {
+          this.setState({
+            checkedKeys: menuIds,
+            record,
+            distributeModalVisible: true,
+          });
+        },
+      },
     });
+   
   };
 
   render() {
@@ -194,12 +202,12 @@ export default class extends BaseComponent {
           <Toolbar
             appendLeft={
               <Button.Group>
-                <AuthWrapper authorized="add" menuRoute={PAGE_PATH}>
+                <AuthWrapper authorized="add" pageCode={PAGE_CODE}>
                   <Button type="primary" icon={<PlusOutlined/>} onClick={this.onAdd}>
                     新增
                   </Button>
                 </AuthWrapper>
-                <AuthWrapper authorized="delete" menuRoute={PAGE_PATH}>
+                <AuthWrapper authorized="delete" pageCode={PAGE_CODE}>
                   <Button
                     disabled={!rows.length}
                     onClick={(e) => this.onDelete(rows)}

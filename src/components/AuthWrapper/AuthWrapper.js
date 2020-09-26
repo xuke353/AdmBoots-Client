@@ -6,10 +6,10 @@ import $$ from 'cmn-utils';
  * 校验当前用户是否有功能编码对应的权限
  * @param {string} authorized
  */
-export function checkAuth(authorized, menuRoute) {
+export function checkAuth(authorized, pageCode) {
   const permissionList = $$.getStore('permission');
   return permissionList ? permissionList.some(
-    (p) => p.uri === menuRoute && p.code === authorized
+    (p) => p.pageCode === pageCode && p.btnCode === authorized
   ) : false;
 }
 
@@ -19,7 +19,7 @@ export function checkAuth(authorized, menuRoute) {
 class AuthWrapper extends PureComponent {
   render() {
     return (
-      checkAuth(this.props.authorized, this.props.menuRoute) &&
+      checkAuth(this.props.authorized, this.props.pageCode) &&
       this.props.children
     );
   }
@@ -27,7 +27,7 @@ class AuthWrapper extends PureComponent {
 
 AuthWrapper.propTypes = {
   authorized: PropTypes.string,
-  menuRoute: PropTypes.string,
+  pageCode: PropTypes.string,
 };
 
 export default AuthWrapper;

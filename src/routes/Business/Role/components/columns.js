@@ -4,7 +4,7 @@ import DataTable from 'components/DataTable';
 import Button from 'components/Button';
 import AuthWrapper from 'components/AuthWrapper';
 import { formatDateTime } from '@/utils/tool';
-import {PAGE_PATH} from '../index';
+import {PAGE_CODE} from '../index';
 
 export default (self) => [
   {
@@ -47,7 +47,7 @@ export default (self) => [
       width: 240,
       render: (text, record) => (
         <DataTable.Oper className="col-align-right">
-          <AuthWrapper authorized="update" menuRoute={PAGE_PATH}>
+          <AuthWrapper authorized="update" pageCode={PAGE_CODE}>
             <Button
               size="small"
               type="primary"
@@ -57,7 +57,7 @@ export default (self) => [
               编辑
             </Button>
           </AuthWrapper>
-          <AuthWrapper authorized="delete" menuRoute={PAGE_PATH}>
+          <AuthWrapper authorized="delete" pageCode={PAGE_CODE}>
             <Button
               size="small"
               type="danger"
@@ -67,7 +67,7 @@ export default (self) => [
               删除
             </Button>
           </AuthWrapper>
-          <AuthWrapper authorized="auth" menuRoute={PAGE_PATH}>
+          <AuthWrapper authorized="auth" pageCode={PAGE_CODE}>
             <Button
               size="small"
               type="primary"

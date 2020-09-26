@@ -10,4 +10,4 @@ const routesConfig = app => ({
 });
 
 export default app => createRoute(app, routesConfig);
-export const PAGE_PATH = '/role';
+export const PAGE_CODE = 'juesgl';

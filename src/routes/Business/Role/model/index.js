@@ -38,9 +38,9 @@ export default modelEnhance({
           pageData: pageData.startPage(1, 20),
         },
       });
-      yield put({
-        type: 'getMenus',
-      });
+      // yield put({
+      //   type: 'getMenus',
+      // });
     },
     // 获取分页数据
     *getPageInfo({ payload }, { call, put }) {
@@ -118,6 +118,7 @@ export default modelEnhance({
     },
     // 获取菜单树
     *getMenus({ payload }, { call, put }) {
+      const { success } = payload;
       yield put({
         type: '@request',
         afterResponse: (resp) => resp.data,
@@ -127,6 +128,7 @@ export default modelEnhance({
           method: 'GET',
         },
       });
+      success();
     },
     // 给菜单赋角色
     *distributeMenus({ payload }, { call, put, select }) {
