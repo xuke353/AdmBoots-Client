@@ -1526,6 +1526,15 @@
     "@types/istanbul-reports" "^1.1.1"
     "@types/yargs" "^13.0.0"
 
+"@microsoft/signalr@^3.1.8":
+  version "3.1.8"
+  resolved "https://registry.yarnpkg.com/@microsoft/signalr/-/signalr-3.1.8.tgz#baff38fc2924a77812d8bd7ccfc9752e28a756fd"
+  integrity sha512-bvgLjz7sE0bwVezaV4yNDckC4HnaX+1E3MpQcO0mGYUaIbKkF3asKaLk3KAPYbIF13eqwVRnYEBLyf3LnkUyMw==
+  dependencies:
+    eventsource "^1.0.7"
+    request "^2.88.0"
+    ws "^6.0.0"
+
 "@mrmlnc/readdir-enhanced@^2.2.1":
   version "2.2.1"
   resolved "http://registry.npm.taobao.org/@mrmlnc/readdir-enhanced/download/@mrmlnc/readdir-enhanced-2.2.1.tgz#524af240d1a360527b730475ecfa1344aa540dde"

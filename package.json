@@ -19,6 +19,7 @@
     "@ant-design/compatible": "^1.0.1",
     "@ant-design/icons": "^4.0.3",
     "@antv/data-set": "^0.8.9",
+    "@microsoft/signalr": "^3.1.8",
     "antd": "^4.0.3",
     "bizcharts": "^3.5.9",
     "classnames": "^2.2.5",
