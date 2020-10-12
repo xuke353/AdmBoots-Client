@@ -7,9 +7,17 @@ import Panel from 'components/Panel';
 import G2 from 'components/Charts/G2';
 import DataSet from '@antv/data-set';
 import './index.less';
+import {
+  JsonHubProtocol,
+  HubConnectionState,
+  HubConnectionBuilder,
+  LogLevel
+} from '@microsoft/signalr';
+import store from 'cmn-utils/lib/store';
+const IsDev = process.env.NODE_ENV !== 'production';
+
 const { Content } = Layout;
 const { Chart, Axis, Geom, Tooltip, Legend, Coord, Label } = G2;
-
 const rankingListData = [];
 for (let i = 0; i < 7; i += 1) {
   rankingListData.push({
@@ -22,9 +30,93 @@ for (let i = 0; i < 7; i += 1) {
   dashboard
 }))
 export default class Dashboard extends BaseComponent {
+  state = {
+    qq: 0,
+    weChat: 0,
+    skype: 0,
+    github: 0
+  };
+  componentDidMount() {
+    //连接signalr
+    this.FnsignalR();
+  }
+  FnsignalR = async () =>{     
+    const user = store.getStore('user');
+    if(user){
+      const token = user.accessToken;
+      console.log(token, "----token signalr---")
+      this.setupSignalRConnection(IsDev ? 'http://localhost:8082/api/chatHub' : "/api/chatHub", token)
+    }    
+  }
+
+  startSignalRConnection = async connection => {
+    try {
+        await connection.start();
+        console.assert(connection.state === HubConnectionState.Connected);
+        console.log('SignalR connection established');
+    } catch (err) {
+        console.assert(connection.state === HubConnectionState.Disconnected);
+        console.error('SignalR Connection Error: ', err);
+        setTimeout(() => this.startSignalRConnection(connection), 5000);
+    }
+};
+//SignalRC
+setupSignalRConnection = (connectionHub, getAccessToken) => {
+    const options = {
+        logMessageContent: IsDev,
+        logger: IsDev ? LogLevel.Warning : LogLevel.Error,
+        accessTokenFactory: () => getAccessToken
+    };
+    // create the connection instance
+    // withAutomaticReconnect will automatically try to reconnect
+    // and generate a new socket connection if needed
+    const connection = new HubConnectionBuilder()
+        .withUrl(connectionHub, options)
+        .withAutomaticReconnect()
+        .withHubProtocol(new JsonHubProtocol())
+        .configureLogging(LogLevel.Information)
+        .build();
+ 
+    // Note: to keep the connection open the serverTimeout should be
+    // larger than the KeepAlive value that is set on the server
+    // keepAliveIntervalInMilliseconds default is 15000 and we are using default
+    // serverTimeoutInMilliseconds default is 30000 and we are using 60000 set below
+    connection.serverTimeoutInMilliseconds = 60000;
+ 
+    // re-establish the connection if connection dropped
+    connection.onclose(error => {
+        console.assert(connection.state === HubConnectionState.Disconnected);
+        console.log('Connection closed due to error. Try refreshing this page to restart the connection', error);
+    });
+ 
+    connection.onreconnecting(error => {
+        console.assert(connection.state === HubConnectionState.Reconnecting);
+        console.log('Connection lost due to error. Reconnecting.', error);
+    });
+ 
+    connection.onreconnected(connectionId => {
+        console.assert(connection.state === HubConnectionState.Connected);
+        console.log('Connection reestablished. Connected with connectionId', connectionId);
+    });
+ 
+    this.startSignalRConnection(connection);
+ 
+    connection.on('getCount', res => {
+        console.log("SignalR get hot res:", res)
+        this.setState({
+          qq: res.qq,
+          weChat: res.weChat,
+          skype: res.skype,
+          github: res.github});
+    });
+ 
+    return connection;
+};
+
   render() {
     const { dashboard } = this.props;
     const { bar1, bar2 } = dashboard;
+    const { qq, weChat, skype, github } = this.state;
     return (
       <Layout className="full-layout page dashboard-page">
         <Content>
@@ -33,7 +125,7 @@ export default class Dashboard extends BaseComponent {
               <Panel className="qq" header={false} cover>
                 <Icon type="QqOutlined" antd />
                 <h2>
-                  <b>523</b>
+                  <b>{qq}</b>
                 </h2>
                 <h5 className="text-muted">QQ</h5>
               </Panel>
@@ -42,7 +134,7 @@ export default class Dashboard extends BaseComponent {
               <Panel className="wechat" header={false} cover>
                 <Icon type="WechatOutlined" antd />
                 <h2>
-                  <b>99+</b>
+                  <b>{weChat}</b>
                 </h2>
                 <h5 className="text-muted">微信</h5>
               </Panel>
@@ -51,7 +143,7 @@ export default class Dashboard extends BaseComponent {
               <Panel className="skype" header={false} cover>
                 <Icon type="SkypeOutlined" antd />
                 <h2>
-                  <b>2</b>
+                  <b>{skype}</b>
                 </h2>
                 <h5 className="text-muted">skype</h5>
               </Panel>
@@ -60,7 +152,7 @@ export default class Dashboard extends BaseComponent {
               <Panel className="github" header={false} cover>
                 <Icon type="GithubOutlined" antd />
                 <h2>
-                  <b>1k+</b>
+                  <b>{github}</b>
                 </h2>
                 <h5 className="text-muted">github</h5>
               </Panel>
