@@ -25,7 +25,7 @@ for (let i = 0; i < 7; i += 1) {
     total: 323234
   });
 }
-
+let LOADED = false;
 @connect(({ dashboard }) => ({
   dashboard
 }))
@@ -37,8 +37,12 @@ export default class Dashboard extends BaseComponent {
     github: 0
   };
   componentDidMount() {
-    //连接signalr
-    this.FnsignalR();
+    if(!LOADED){
+      //连接signalr
+      this.FnsignalR();
+      LOADED= true;
+    }
+    
   }
   componentWillUnmount() {
     this.unmount = true;    
