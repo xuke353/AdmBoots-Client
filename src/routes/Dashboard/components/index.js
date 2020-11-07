@@ -40,6 +40,9 @@ export default class Dashboard extends BaseComponent {
     //连接signalr
     this.FnsignalR();
   }
+  componentWillUnmount() {
+    this.unmount = true;    
+  }
   FnsignalR = async () =>{     
     const user = store.getStore('user');
     if(user){
@@ -103,11 +106,12 @@ setupSignalRConnection = (connectionHub, getAccessToken) => {
  
     connection.on('getCount', res => {
         console.log("SignalR get hot res:", res)
-        this.setState({
-          qq: res.qq,
-          weChat: res.weChat,
-          skype: res.skype,
-          github: res.github});
+        if(!this.unmount)
+          this.setState({
+            qq: res.qq,
+            weChat: res.weChat,
+            skype: res.skype,
+            github: res.github});
     });
  
     return connection;
